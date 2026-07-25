@@ -1,0 +1,24 @@
+<!doctype html><html lang="el"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Menu | JINNI</title><style>
+:root{--blue:#1da5c1;--navy:#08283f;--red:#d4213a;--cream:#fff8eb}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--navy);background:linear-gradient(145deg,#25afca,#138da8);min-height:100vh}
+a{text-decoration:none;color:inherit}.wrap{width:min(920px,calc(100% - 28px));margin:auto}.top{display:flex;justify-content:space-between;align-items:center;padding:18px 0;color:#fff;font-weight:900}
+.brand{font-weight:1000;font-size:clamp(68px,18vw,145px);letter-spacing:-.08em;color:var(--red);-webkit-text-stroke:5px #fff;paint-order:stroke fill;line-height:.85;text-shadow:0 8px 0 rgba(8,40,63,.15)}
+.tag{color:#fff;font-weight:1000;letter-spacing:.14em;font-size:clamp(17px,3vw,25px);margin-top:24px}
+.hero{min-height:72vh;display:flex;align-items:center;text-align:center}.hero>div{width:100%}.lead{color:#fff;line-height:1.6;font-size:17px}
+.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:25px}.btn{border:0;border-radius:15px;padding:16px 20px;font-weight:950;cursor:pointer}.main{background:var(--red);color:#fff}.light{background:#fff;color:var(--navy)}
+.socials{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding-bottom:35px}.socials a{background:#fff;border-radius:15px;padding:15px;text-align:center;font-weight:900}
+.menu-head{text-align:center;padding:18px 0 25px}.menu-head .brand{font-size:90px}.nav{position:sticky;top:8px;z-index:4;display:flex;overflow:auto;gap:8px;background:rgba(8,40,63,.93);padding:9px;border-radius:16px;margin-bottom:18px}.nav a{flex:0 0 auto;color:#fff;font-weight:900;font-size:13px;padding:9px 12px}
+.section{background:#fff;border-radius:22px;padding:21px;margin-bottom:15px;box-shadow:0 15px 32px rgba(8,40,63,.16)}.section h2{margin:0 0 6px;font-size:28px}.item{display:grid;grid-template-columns:1fr auto;gap:12px;padding:14px 0;border-top:1px solid rgba(8,40,63,.12)}.item h3{margin:0;font-size:17px}.item p{margin:5px 0 0;color:#5d7483;font-size:14px}.price{background:var(--cream);color:var(--red);font-weight:1000;border-radius:999px;padding:7px 10px;height:max-content}
+.footer{text-align:center;color:#fff;padding:30px}.only-en{display:none}body.en .only-gr{display:none}body.en .only-en{display:block}
+@media(max-width:560px){.socials{grid-template-columns:1fr 1fr}.section{padding:18px 16px}}
+</style></head>
+<body><div class="wrap"><div class="top"><a href="/">← HOME</a><button class="btn light" id="lang">GR / EN</button></div>
+<header class="menu-head"><div class="brand">JINNI</div><div class="tag">MENU</div></header><nav class="nav" id="nav"></nav><main id="menu"></main>
+<div class="section"><span class="only-gr">Οι πατάτες είναι κατεψυγμένο προϊόν. Ενημερώστε μας για αλλεργίες ή δυσανεξίες.</span><span class="only-en">Fries are a frozen product. Please inform us about allergies or intolerances.</span></div></div>
+<footer class="footer">Cantina JINNI Kythira</footer><script src="/menu-data.js"></script><script>
+const icons={"Pasta":"🍝","Fried & Loaded":"🍗","Sandwiches":"🥪","Special & Sweet":"✨","Extras & Sauces":"➕","Refreshments":"🥤","Beers":"🍺","Signature Cocktails":"🍹"};
+const data=(window.JINNI_MENU||[]).filter(x=>x.visible!==false);const cats=[...new Set(data.map(x=>x.category))];
+document.getElementById('nav').innerHTML=cats.map((c,i)=>`<a href="#c${i}">${icons[c]||''} ${c}</a>`).join('');
+document.getElementById('menu').innerHTML=cats.map((c,i)=>`<section class="section" id="c${i}"><h2>${icons[c]||''} ${c}</h2>${data.filter(x=>x.category===c).map(x=>`<article class="item"><div><h3>${x.name}</h3>${x.gr?`<p class="only-gr">${x.gr}</p>`:''}${x.en?`<p class="only-en">${x.en}</p>`:''}</div><div class="price">${x.price}</div></article>`).join('')}</section>`).join('');
+document.getElementById('lang').onclick=()=>document.body.classList.toggle('en');
+</script></body></html>

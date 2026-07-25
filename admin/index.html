@@ -1,0 +1,41 @@
+<!doctype html><html lang="el"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JINNI Menu Admin</title><style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f3f6f8;color:#08283f}.wrap{width:min(1100px,calc(100% - 24px));margin:auto;padding:24px 0 60px}
+header{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}h1{margin:0}.card{background:#fff;border-radius:18px;padding:18px;margin-top:16px;box-shadow:0 8px 25px rgba(8,40,63,.08)}
+.controls{display:flex;gap:9px;flex-wrap:wrap}.btn{border:0;border-radius:12px;padding:12px 15px;font-weight:900;cursor:pointer}.red{background:#d4213a;color:#fff}.blue{background:#1598b4;color:#fff}.dark{background:#08283f;color:#fff}.light{background:#eaf0f3}
+.grid{display:grid;grid-template-columns:1.3fr .9fr .6fr auto auto;gap:8px;align-items:center;padding:10px 0;border-top:1px solid #e5eaed}.grid:first-child{border-top:0}
+input,select,textarea{width:100%;padding:10px;border:1px solid #cad5db;border-radius:9px;font:inherit}.small{font-size:13px;color:#667b87;line-height:1.5}.hidden{opacity:.48}.danger{background:#ffe7ea;color:#b1132a}.status{padding:10px 12px;border-radius:10px;background:#e8f8ef;color:#167044;margin-top:12px;display:none}
+@media(max-width:760px){.grid{grid-template-columns:1fr 95px auto}.cat{grid-column:1/-1}.toggle{display:none}}
+</style></head>
+<body><div class="wrap"><header><div><h1>JINNI Menu Admin</h1><div class="small">Επεξεργασία χωρίς κώδικα</div></div><div class="controls"><a class="btn light" href="/menu/" target="_blank">Προβολή menu</a><button class="btn blue" id="add">+ Νέο προϊόν</button><button class="btn red" id="download">⬇ Λήψη νέου ZIP</button></div></header>
+<div class="card"><strong>Πώς λειτουργεί</strong><p class="small">Κάνε τις αλλαγές σου και πάτησε «Λήψη νέου ZIP». Μετά στο Cloudflare Pages πάτησε Create deployment και ανέβασε το ZIP. Οι αλλαγές δεν δημοσιεύονται πριν το νέο deployment.</p><div id="status" class="status"></div></div>
+<div class="card"><div id="rows"></div></div></div>
+<script src="/menu-data.js"></script><script>
+let data=JSON.parse(localStorage.getItem('jinniMenuDraft')||JSON.stringify(window.JINNI_MENU||[]));
+const cats=["Pasta","Fried & Loaded","Sandwiches","Special & Sweet","Extras & Sauces","Refreshments","Beers","Signature Cocktails"];
+const esc=s=>(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function save(){localStorage.setItem('jinniMenuDraft',JSON.stringify(data));}
+function render(){
+ document.getElementById('rows').innerHTML=data.map((x,i)=>`<div class="grid ${x.visible===false?'hidden':''}">
+ <select class="cat" data-i="${i}" data-k="category">${cats.map(c=>`<option ${c===x.category?'selected':''}>${c}</option>`).join('')}</select>
+ <input value="${esc(x.name)}" data-i="${i}" data-k="name" placeholder="Προϊόν">
+ <input value="${esc(x.price)}" data-i="${i}" data-k="price" placeholder="Τιμή">
+ <button class="btn light toggle" data-action="toggle" data-i="${i}">${x.visible===false?'Εμφάνιση':'Απόκρυψη'}</button>
+ <button class="btn danger" data-action="delete" data-i="${i}">Διαγραφή</button>
+ </div>`).join('');
+ document.querySelectorAll('[data-k]').forEach(el=>el.oninput=e=>{let i=+e.target.dataset.i;data[i][e.target.dataset.k]=e.target.value;save();});
+ document.querySelectorAll('[data-action]').forEach(el=>el.onclick=e=>{let i=+e.target.dataset.i;if(e.target.dataset.action==='delete'){if(confirm('Να διαγραφεί το προϊόν;'))data.splice(i,1);}else data[i].visible=data[i].visible===false;save();render();});
+}
+document.getElementById('add').onclick=()=>{data.unshift({category:'Pasta',name:'Νέο προϊόν',gr:'',en:'',price:'0,00 €',visible:true});save();render();};
+function crc32(bytes){let c=-1;for(let b of bytes){c^=b;for(let k=0;k<8;k++)c=(c>>>1)^((c&1)?0xEDB88320:0);}return (c^-1)>>>0;}
+const u16=n=>new Uint8Array([n&255,(n>>>8)&255]);const u32=n=>new Uint8Array([n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255]);
+function concat(arrs){let n=arrs.reduce((s,a)=>s+a.length,0),o=new Uint8Array(n),p=0;for(let a of arrs){o.set(a,p);p+=a.length;}return o;}
+function makeZip(files){const enc=new TextEncoder();let parts=[],central=[],offset=0;for(const f of files){let name=enc.encode(f.name),body=typeof f.data==='string'?enc.encode(f.data):f.data,crc=crc32(body);
+ let local=concat([u32(0x04034b50),u16(20),u16(0),u16(0),u16(0),u16(0),u32(crc),u32(body.length),u32(body.length),u16(name.length),u16(0),name,body]);
+ parts.push(local);let cent=concat([u32(0x02014b50),u16(20),u16(20),u16(0),u16(0),u16(0),u16(0),u32(crc),u32(body.length),u32(body.length),u16(name.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(offset),name]);central.push(cent);offset+=local.length;}
+ let c=concat(central),end=concat([u32(0x06054b50),u16(0),u16(0),u16(files.length),u16(files.length),u32(c.length),u32(offset),u16(0)]);return new Blob([...parts,c,end],{type:'application/zip'});}
+document.getElementById('download').onclick=async()=>{try{const paths=['/index.html','/menu/index.html','/admin/index.html'];let files=[];for(const p of paths){let r=await fetch(p+'?v='+Date.now());files.push({name:p.slice(1),data:await r.text()});}
+ files.push({name:'menu-data.js',data:'window.JINNI_MENU = '+JSON.stringify(data,null,2)+';\n'});
+ let blob=makeZip(files),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Cantina_JINNI_UPDATED.zip';a.click();URL.revokeObjectURL(a.href);
+ let st=document.getElementById('status');st.style.display='block';st.textContent='Το νέο ZIP κατέβηκε. Ανέβασέ το στο Create deployment.';}catch(e){alert('Δεν μπόρεσε να δημιουργηθεί το ZIP: '+e.message);}};
+render();
+</script></body></html>
