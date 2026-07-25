@@ -33,22 +33,6 @@ window.JINNI_MENU = [
   },
   {
     "category": "Fried & Loaded",
-    "name": "Jinni Red Crunch",
-    "gr": "Τραγανό κοτόπουλο με κόκκινη σάλτσα.",
-    "en": "Crispy chicken with red sauce.",
-    "price": "10,00 €",
-    "visible": true
-  },
-  {
-    "category": "Fried & Loaded",
-    "name": "Jinni White Crunch",
-    "gr": "Τραγανό κοτόπουλο με λευκή σάλτσα.",
-    "en": "Crispy chicken with white sauce.",
-    "price": "10,00 €",
-    "visible": true
-  },
-  {
-    "category": "Fried & Loaded",
     "name": "Crunch Box",
     "gr": "Τραγανό κοτόπουλο με πατάτες.",
     "en": "Crispy chicken served with fries.",
