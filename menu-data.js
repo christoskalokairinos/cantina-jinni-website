@@ -1,5 +1,13 @@
 window.JINNI_MENU = [
   {
+    "category": "Signature Cocktails",
+    "name": "Paloma Pink",
+    "gr": "",
+    "en": "",
+    "price": "7,00 €",
+    "visible": true
+  },
+  {
     "category": "Pasta",
     "name": "Red Magic",
     "gr": "Σάλτσα ντομάτας. Επιλογή linguine ή rigatoni.",
