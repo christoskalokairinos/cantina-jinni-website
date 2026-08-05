@@ -244,7 +244,7 @@ window.JINNI_MENU = [
     "name": "Μάμος / Mamos",
     "gr": "",
     "en": "",
-    "price": "4,00 €",
+    "price": "5,00 €",
     "visible": true
   },
   {
@@ -252,7 +252,7 @@ window.JINNI_MENU = [
     "name": "Fischer",
     "gr": "",
     "en": "",
-    "price": "4,00 €",
+    "price": "5,00 €",
     "visible": true
   },
   {
